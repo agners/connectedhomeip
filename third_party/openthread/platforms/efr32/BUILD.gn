@@ -45,7 +45,7 @@ source_set("openthread_core_config_efr32") {
 }
 
 source_set("openthread_mbedtls_config_efr32") {
-  sources = [ "${openthread_root}/examples/platforms/efr32/${efr32_family}/crypto/mbedtls_config_autogen.h" ]
+  sources = [ "${openthread_root}/examples/platforms/efr32/efr32mg21/crypto/mbedtls_config_autogen.h" ]
 }
 
 source_set("libopenthread-efr32") {

@@ -142,6 +142,8 @@ efr32_executable("lighting_app") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
+  } else if (efr32_family == "mgm21") {
+    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

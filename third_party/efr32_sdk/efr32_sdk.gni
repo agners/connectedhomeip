@@ -205,6 +205,28 @@ template("efr32_sdk") {
         "EFR32MG21",
         "EFR32_SERIES2_CONFIG1_MICRO",
       ]
+    } else if (efr32_family == "mgm21") {
+      _include_dirs += [
+        "${efr32_sdk_root}/hardware/kit/MGM21_${efr32_board}/config",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM21/Include",
+        "${efr32_sdk_root}/hardware/module/config",
+        "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
+        "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM3",
+        "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21/config",
+        "${efr32_sdk_root}/util/third_party/crypto/sl_component/se_manager/src",
+      ]
+
+      libs += [
+        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/binapploader.o",
+        "${efr32_sdk_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
+        "${efr32_sdk_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
+        "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
+      ]
+
+      defines += [
+        "MGM21",
+        "EFR32_SERIES2_CONFIG1_MICRO",
+      ]
     }
 
     cflags = []

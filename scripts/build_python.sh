@@ -120,7 +120,7 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_deta
 if [ "$enable_pybindings" == true ]; then
     ninja -C "$OUTPUT_ROOT" pycontroller
 else
-    ninja -C "$OUTPUT_ROOT" python
+    ninja -C "$OUTPUT_ROOT" python chip-clusters 
 fi
 
 if [ "$enable_pybindings" == true ]; then

@@ -46,6 +46,8 @@ parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
 parser.add_argument(
     '--server', help='build the server variant', default=False, type=bool)
+parser.add_argument(
+    '--clusters', help='build clusters only variant', default=False, type=bool)
 
 args = parser.parse_args()
 
@@ -65,9 +67,8 @@ else:
 packageName = args.package_name
 chipPackageVer = args.build_number
 
-if args.server:
-    installScripts = []
-else:
+installScripts = []
+if not args.clusters and not args.server:
     installScripts = [
         InstalledScriptInfo("chip-device-ctrl.py"),
         InstalledScriptInfo("chip-repl.py"),
@@ -149,6 +150,12 @@ try:
         requiredPackages.append("dbus-python")
         requiredPackages.append("pygobject")
 
+    if args.clusters:
+        requiredPackages = [
+            'dacite',
+            'construct',
+        ]
+
     #
     # Build the chip package...
     #
@@ -169,6 +176,14 @@ try:
         'chip.setup_payload',
         'chip.storage',
     ]
+    if args.clusters:
+        packages = [
+            'chip',
+            'chip.clusters',
+            'chip.exceptions',
+            'chip.clusters',
+            'chip.tlv',
+        ]
     #print ("Server: {}".format(args.server))
     if args.server:
         packages.append('chip.server')
@@ -199,7 +214,7 @@ try:
             # By default, look in the tmp directory for packages/modules to be included.
             '': tmpDir,
         },
-        package_data={
+        package_data={} if args.clusters else {
             packageName: [
                 # Include the wrapper DLL as package data in the "chip" package.
                 chipDLLName
@@ -215,7 +230,7 @@ try:
                 'universal': False,
                 # Place the generated .whl in the dist directory.
                 'dist_dir': distDir,
-                'py_limited_api': 'cp37',
+                'py_limited_api': False if args.clusters else 'cp37',
                 'plat_name': args.plat_name,
             },
             'egg_info': {
@@ -223,7 +238,7 @@ try:
                 'egg_base': tmpDir
             }
         },
-        cmdclass={
+        cmdclass={} if args.clusters else {
             'bdist_wheel': bdist_wheel_override
         },
         script_args=['clean', '--all', 'bdist_wheel']

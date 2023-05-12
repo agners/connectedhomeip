@@ -38,6 +38,7 @@ using namespace ::chip::DeviceLayer;
 static const char * TAG = "app-task";
 
 LEDWidget AppLED;
+Button gButtons[BUTTON_NUMBER] = { Button((gpio_num_t) CONFIG_BUTTON_GPIO) };
 
 namespace {
 constexpr EndpointId kLightEndpointId = 1;
@@ -104,11 +105,25 @@ void AppTask::ButtonPressedAction(AppEvent * aEvent)
 }
 #endif
 
+esp_err_t AppTask::InitButtons()
+{
+    esp_err_t err;
+
+    // Initialize the buttons.
+    err = gpio_install_isr_service(0);
+    ESP_RETURN_ON_ERROR(err, TAG, "Button preInit failed: %s", esp_err_to_name(err));
+    gButtons[0].Init();
+    ESP_LOGI(TAG, "Button initialized");
+
+    return err;
+}
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AppLED.Init();
+    InitButtons();
 
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();

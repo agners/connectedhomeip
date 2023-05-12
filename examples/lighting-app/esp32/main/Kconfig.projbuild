@@ -99,6 +99,15 @@ menu "Demo"
         help
             GPIO number (IOxx) to blink on and off or the RMT signal for the addressable LED.
 
+    config BUTTON_GPIO
+        int "Button GPIO number"
+        range 0 48
+        default 2 if DEVICE_TYPE_ESP32_C3_DEVKITM
+        default 3
+        help
+            GPIO number (IOxx) for a Button to turn on and off the light.
+
+
     choice
       prompt "Rendezvous Mode"
       default RENDEZVOUS_MODE_BLE

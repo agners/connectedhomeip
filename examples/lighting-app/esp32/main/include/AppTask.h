@@ -52,6 +52,7 @@ public:
 
 private:
     friend AppTask & GetAppTask(void);
+    esp_err_t InitButtons();
     CHIP_ERROR Init();
     void DispatchEvent(AppEvent * event);
     static void SwitchActionEventHandler(AppEvent * aEvent);

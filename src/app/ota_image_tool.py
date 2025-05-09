@@ -34,6 +34,9 @@ import hashlib
 import os
 import struct
 import sys
+import json
+import pathlib
+from base64 import b64encode
 from enum import IntEnum
 
 sys.path.insert(0, os.path.join(
@@ -252,6 +255,14 @@ def remove_header(args: object) -> None:
                 outfile.write(chunk)
 
 
+def compute_sha256_checksum(file_path: str) -> str:
+    sha256_hash = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        for byte_block in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(byte_block)
+    return sha256_hash.digest()
+
+
 def show_header(args: object):
     """
     Parse and present OTA image header in human-readable form
@@ -274,6 +285,41 @@ def show_header(args: object):
             value = f'{value} (0x{value:x})'
 
         print(f'  [{tag}] {tag_name}: {value}')
+
+    vid = header_tlv.get(HeaderTag.VENDOR_ID, None)
+    pid = header_tlv.get(HeaderTag.PRODUCT_ID, None)
+    version = header_tlv.get(HeaderTag.VERSION, None)
+    version_string = header_tlv.get(HeaderTag.VERSION_STRING, None)
+    payload_size = header_tlv.get(HeaderTag.PAYLOAD_SIZE, None)
+
+    digest_type = 1
+    digest = compute_sha256_checksum(args.image_file)
+
+    image_file_path = pathlib.Path(args.image_file)
+    if image_file_path.is_absolute():
+        image_file_path = image_file_path.relative_to(pathlib.Path.cwd())
+
+    json_data = {
+        "modelVersion": {
+            "vid": vid,
+            "pid": pid,
+            "softwareVersion": version,
+            "softwareVersionString": version_string,
+            "cdVersionNumber": 1,
+            "firmwareInformation": "",
+            "softwareVersionValid": True,
+            "otaUrl": f"file:///{image_file_path}",
+            "otaFileSize": str(payload_size),
+            "otaChecksum": b64encode(digest).decode("utf-8") if isinstance(digest, bytes) else digest,
+            "otaChecksumType": digest_type,
+            "minApplicableSoftwareVersion": 0,
+            "maxApplicableSoftwareVersion": version - 1,
+            "releaseNotesUrl": "",
+        }
+    }
+
+    print()
+    print(json.dumps(json_data))
 
 
 def update_header_args(args: object) -> None:
